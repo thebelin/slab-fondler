@@ -45,7 +45,7 @@ window._Controls = function (el) {
   // Draw a touch event
   const DrawTouch = touch => {
     ctx.beginPath();
-    ctx.arc(touch.pageX, touch.pageY, touch.force ? touch.force * 50 : 10, 0, 2 * Math.PI, false);  // a circle at the start
+    ctx.arc(touch.pageX, touch.pageY, touch.radiusX ? touch.radiusX / 2 : 10, 0, 2 * Math.PI, false);  // a circle at the start
     ctx.fillStyle = ColorForTouch(touch);
     ctx.fill();
   };
@@ -98,15 +98,12 @@ window._Controls = function (el) {
     touchstart: evt => {
       // evt.preventDefault();
       let touches = evt.changedTouches;
-      // fill the screen with the canvas on first touch
-      if (screenfull.enabled)
-        screenfull.request();
   
       // Debug the touches
       Object.keys(touches).forEach(touchId => {
         ongoingTouches.push(CopyTouch(touches[touchId]));
         DrawTouch(touches[touchId]);
-        Vibe(touches[touchId].force ? touches[touchId].force / 2 : 1)
+        Vibe(touches[touchId].force ? touches[touchId].force * 2 : 4)
       });
 
       SendTouches({type: 'touchstart'});
@@ -121,7 +118,7 @@ window._Controls = function (el) {
         if (idx >= 0)
           ongoingTouches.splice(idx, 1);  // remove it; we're done
 
-        Vibe(touches[touchId].force ? touches[touchId].force / 5 : .2)
+        Vibe(touches[touchId].force ? touches[touchId].force : 2)
       });
 
       SendTouches({type: 'touchend'});
