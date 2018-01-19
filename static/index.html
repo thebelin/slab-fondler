@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
   	<title>Interactive Page</title>
+  	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="viewport" content="minimal-ui, width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 </head>
 <style>
 body {
@@ -14,10 +15,11 @@ body {
 	position: absolute;
 	top: 0;
 	left: 0;
+	background-color: #000;
 };
 </style>
 <body>
-<canvas id="body-ctx"></canvas>
+<canvas id="body-ctx" ></canvas>
 <script type="text/javascript">
 	document.body.addEventListener('touchmove', function(event) {
   	event.preventDefault();

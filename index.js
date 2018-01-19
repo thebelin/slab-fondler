@@ -61,6 +61,9 @@ app.use(compression());
 // Make the http folder available as the root, to deliver the static content
 app.use('/', require('express').static('static'));
 
+// make the screenfull dist folder available to the user
+app.use('/screenfull', require('express').static('node_modules/screenfull/dist'));
+
 console.log('starting http server on port ' + port);
 
 // Start the HTTP listener on http
