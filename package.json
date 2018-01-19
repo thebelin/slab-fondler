@@ -1,0 +1,19 @@
+{
+  "name": "slab-fondler",
+  "version": "0.0.1",
+  "description": "A web portal which allows movements and touch events on a phone to be tracked and transmitted by a multiplayer host",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "thebelin",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "compression": "^1.7.1",
+    "ejs": "^2.5.7",
+    "express": "^4.16.2",
+    "morgan": "^1.9.0",
+    "socket.io": "^2.0.4"
+  }
+}
