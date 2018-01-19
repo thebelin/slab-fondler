@@ -157,8 +157,9 @@ io
   io
     .of('/controls')
     .on('connection', socket => {
+      console.log("controls connection");
       socket.on('control', data => {
-        console.log("control data from user", data);
+        console.log("control data from user", JSON.stringify(data, null, 2));
         // Add the user socket id to the data
         data = Object.assign({i: socket.id.replace("/controls#", "")}, data);
 

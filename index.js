@@ -25,7 +25,7 @@ const fs = require('fs');
 const socket = require('socket.io');
 
 // Set the port to env setting or default
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 80;
 
 // Express http server
 const httpServer = require('http');
