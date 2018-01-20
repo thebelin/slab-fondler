@@ -4,7 +4,9 @@
 "use strict";
 window._Controls = function (el) {
   // whether to console debug
-  const dbg = false;
+  const dbg = true;
+
+  if (!el) return dbg && console.log('no element for _Controls');
 
   // Minimum number of miiliseconds to wait between each tilt transmission
   const transmissionRate = 50;
@@ -18,6 +20,7 @@ window._Controls = function (el) {
   // The socket transporter
   const socket = io.connect('/controls');
 
+  // Something to explore, but not currently used
   const EnterFullscreen  = () => {
     if (el.requestFullscreen) {
       el.requestFullscreen();
@@ -28,6 +31,13 @@ window._Controls = function (el) {
     } else if (el.msRequestFullscreen) {
       el.msRequestFullscreen();
     }
+  };
+
+  // Fill the screen with the el
+  const FillScreen = () => {
+    dbg && console.log("FillScreen");
+    el.setAttribute('width', document.documentElement.clientWidth + 'px');
+    el.setAttribute('height', document.documentElement.clientHeight + 'px');
   };
 
   // A vibration wrapper
@@ -207,12 +217,12 @@ window._Controls = function (el) {
   let lastTransmission = new Date().getTime();
 
   if (el) {
-
-    el.setAttribute('width', window.outerWidth + 'px');
-    el.setAttribute('height', window.outerHeight + 'px');
-
     // monitor for all listener events and send them as they happen
     Object.keys(listeners).forEach(listener => el.addEventListener(listener, listeners[listener]));
+
+    // monitor for window resize
+    window.addEventListener('resize', () => setTimeout(() => FillScreen, 250), false);
+    FillScreen();
   }
 
   // Subscribe to server side events (not yet used)
@@ -241,18 +251,20 @@ window._Controls = function (el) {
       };
 
       lastTilt = orientation;
-      dbg && console.log('send orientation', frameData.pose.orientation);
+      // dbg && console.log('send orientation', frameData.pose.orientation);
 
       socket.emit('control', {type:'tilt', tilt: orientation});
     }
     vrDisplay.requestAnimationFrame(DoTilts);
   };
 
-  var polyfill = new WebVRPolyfill();
-  dbg && console.log("Using webvr-polyfill version " + WebVRPolyfill.version);
-
-  if (!navigator.getVRDisplays) return dbg && console.log('WebVR is not supported');
+  let polyfill;
   try {
+    polyfill = new WebVRPolyfill();
+    dbg && console.log("Using webvr-polyfill version " + WebVRPolyfill.version);
+
+    if (!navigator.getVRDisplays) return dbg && console.log('WebVR is not supported');
+
     // Get the VRDisplay and save it for later.
     navigator.getVRDisplays().then(
       displays => displays.forEach(display => {
@@ -265,6 +277,7 @@ window._Controls = function (el) {
   } catch(e) {
     console.log('Query of VRDisplays failed' + e.toString());
   }
+
 };
 
 // Execute the Controls function with an argument of the DOM element to monitor
