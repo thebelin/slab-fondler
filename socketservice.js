@@ -2,7 +2,7 @@
 module.exports = (io) => {
 
   // Helper for sending to an array of sockets
-  const Sender = (sockets, type, data) => sockets.forEach(socket => socket.emit(type, data));
+  const Sender = (sockets, type, data) => sockets && sockets.forEach(socket => socket.emit(type, data));
 
   // Disconnection Routine
   const disconnect = (socket, sCol) => {
