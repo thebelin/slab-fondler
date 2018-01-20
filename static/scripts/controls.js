@@ -4,7 +4,7 @@
 "use strict";
 window._Controls = function (el) {
   // whether to console debug
-  const dbg = false;
+  const dbg = fa;se;
 
   // Minimum number of miiliseconds to wait between each tilt transmission
   const transmissionRate = 50;
@@ -201,7 +201,7 @@ window._Controls = function (el) {
   let ongoingTouches = [];
 
   // records the current tilt profile
-  let tilt = null;
+  let tilt, lastTilt = null;
 
   // the time of the last tilt transmission
   let lastTransmission = new Date().getTime();
@@ -223,6 +223,7 @@ window._Controls = function (el) {
 
   // Monitor for all tilt events and send them as they happen
   let vrDisplay;
+
   const DoTilts = () => {
     if (vrDisplay == null) return dbg && console.log('vrDisplay is null');
     let thisTime = new Date().getTime();
@@ -242,7 +243,7 @@ window._Controls = function (el) {
       lastTilt = orientation;
       dbg && console.log('send orientation', frameData.pose.orientation);
 
-      socket.emit('controls', {tilt: orientation});
+      socket.emit('control', {type:'tilt', tilt: orientation});
     }
     vrDisplay.requestAnimationFrame(DoTilts);
   };
@@ -255,15 +256,15 @@ window._Controls = function (el) {
     // Get the VRDisplay and save it for later.
     navigator.getVRDisplays().then(
       displays => displays.forEach(display => {
+        dbg && console.log("display", display, display.capabilities);
         if (display.capabilities.hasOrientation)
           vrDisplay = display;
+          // Start up the tilt engine
+          DoTilts();
       }));
   } catch(e) {
     console.log('Query of VRDisplays failed' + e.toString());
   }
-
-  // Start up the tilt engine
-  DoTilts();
 };
 
 // Execute the Controls function with an argument of the DOM element to monitor
