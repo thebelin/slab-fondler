@@ -64,6 +64,9 @@ app.use('/', require('express').static('static'));
 // make the screenfull dist folder available to the user
 app.use('/screenfull', require('express').static('node_modules/screenfull/dist'));
 
+// make the screenfull dist folder available to the user
+app.use('/webvr-polyfill', require('express').static('node_modules/webvr-polyfill/build'));
+
 console.log('starting http server on port ' + port);
 
 // Start the HTTP listener on http

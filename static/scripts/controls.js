@@ -6,6 +6,9 @@ window._Controls = function (el) {
   // whether to console debug
   const dbg = false;
 
+  // Minimum number of miiliseconds to wait between each tilt transmission
+  const transmissionRate = 50;
+
   // The display context
   const ctx = el.getContext("2d");
   
@@ -14,6 +17,18 @@ window._Controls = function (el) {
 
   // The socket transporter
   const socket = io.connect('/controls');
+
+  const EnterFullscreen  = () => {
+    if (el.requestFullscreen) {
+      el.requestFullscreen();
+    } else if (el.mozRequestFullScreen) {
+      el.mozRequestFullScreen();
+    } else if (el.webkitRequestFullscreen) {
+      el.webkitRequestFullscreen();
+    } else if (el.msRequestFullscreen) {
+      el.msRequestFullscreen();
+    }
+  };
 
   // A vibration wrapper
   const Vibe = function (vibeTime) {
@@ -188,7 +203,9 @@ window._Controls = function (el) {
   // records the current tilt profile
   let tilt = null;
 
-  
+  // the time of the last tilt transmission
+  let lastTransmission = new Date().getTime();
+
   if (el) {
 
     el.setAttribute('width', window.outerWidth + 'px');
@@ -201,9 +218,52 @@ window._Controls = function (el) {
   // Subscribe to server side events (not yet used)
   socket.on('event', data => dbg && console.log('player event data: ', data));
 
-  //@todo monitor for all tilt events and send them as they happen
+  // Fade the touch display
   fadeOut();
 
+  // Monitor for all tilt events and send them as they happen
+  let vrDisplay;
+  const DoTilts = () => {
+    if (vrDisplay == null) return dbg && console.log('vrDisplay is null');
+    let thisTime = new Date().getTime();
+    if (lastTransmission + transmissionRate < thisTime) {
+      lastTransmission = thisTime;
+
+      let frameData = new VRFrameData();
+      vrDisplay.getFrameData(frameData);
+      // Make orientation data easier to interpret in Unity:
+      let orientation = {
+        x: frameData.pose.orientation[0],
+        y: frameData.pose.orientation[1],
+        z: frameData.pose.orientation[2],
+        w: frameData.pose.orientation[3]
+      };
+
+      lastTilt = orientation;
+      dbg && console.log('send orientation', frameData.pose.orientation);
+
+      socket.emit('controls', {tilt: orientation});
+    }
+    vrDisplay.requestAnimationFrame(DoTilts);
+  };
+
+  var polyfill = new WebVRPolyfill();
+  dbg && console.log("Using webvr-polyfill version " + WebVRPolyfill.version);
+
+  if (!navigator.getVRDisplays) return dbg && console.log('WebVR is not supported');
+  try {
+    // Get the VRDisplay and save it for later.
+    navigator.getVRDisplays().then(
+      displays => displays.forEach(display => {
+        if (display.capabilities.hasOrientation)
+          vrDisplay = display;
+      }));
+  } catch(e) {
+    console.log('Query of VRDisplays failed' + e.toString());
+  }
+
+  // Start up the tilt engine
+  DoTilts();
 };
 
 // Execute the Controls function with an argument of the DOM element to monitor
