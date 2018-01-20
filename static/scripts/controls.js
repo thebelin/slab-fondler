@@ -4,7 +4,7 @@
 "use strict";
 window._Controls = function (el) {
   // whether to console debug
-  const dbg = fa;se;
+  const dbg = false;
 
   // Minimum number of miiliseconds to wait between each tilt transmission
   const transmissionRate = 50;
