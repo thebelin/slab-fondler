@@ -85,86 +85,31 @@ io
     Sender(sockets.admin, 'connection', sockets.server.length);
     
     // Subscribe to disconnect routines
-    socket.on('disconnect', () => {
-      disconnect(socket, "server");
-      Sender(sockets.player, 'game', this.currentGame);
-    });
+    socket.on('disconnect', () => disconnect(socket, "server"));
 
     // Player event (goes to one player)
-    socket.on('event', (playerId, eventType, eventData) => {
-      Players.sendPlayer(playerId, {eventType: eventType, eventData: eventData});
-    });
-
-    // Game create event (store the game data, and send to all clients)
-    socket.on('create', gameData => {
-      gameData = JSON.parse(gameData);
-      Players.Reset();
-      this.currentGame = gameData;
-      this.gameStatus = "created";
-
-      // Tell all players that no one is logged in to the new game
-      Sender(sockets.player, 'players', this.players);
-      Sender(sockets.player, 'game', this.currentGame);
-
-      console.log("create game", gameData);
-    });
+    socket.on('event', (playerId, eventType, eventData) => 
+      Players.sendPlayer(playerId, {eventType: eventType, eventData: eventData}));
   });
-
-  // Player state data from the web interface page
-  io
-    .of('/player')
-    .on('connection', socket => {
-      // This is a new player
-      sockets.player.push(socket);
-
-      // This is no longer a player
-      socket.on('disconnect', () => {
-        let socketId = socket.id.replace("/player#", "");
-        Sender(sockets.server, 'playerDisconnect', socketId);
-        disconnect(socket, "player");
-        Players.Remove(socketId);
-        Sender(sockets.player, "players", this.players);
-      });
-      
-      // When the user connects, send them the this.currentGame
-      socket.emit("game", this.currentGame);
-
-      // Also send them information about the logged in players
-      socket.emit("players", this.players);
-
-      // Handle user login (selected callsign and color)
-      socket.on('login', data => {
-        let socketId = socket.id.replace("/player#", "");
-        console.log("player login data", data);
-        Players.Add(data, socketId, socket);
-
-        // Add the user socket id to the data
-        data = Object.assign({i: socketId}, data);
-
-        // forward the data to the server
-        Sender(sockets.server, 'login', data);
-
-        // Tell all the other players about the new one
-        Sender(sockets.player, 'players', this.players);
-
-        // If the game is started, send a start event to the logged in player
-        if (this.gameStatus == "started")
-          socket.emit("start");
-      });
-    });
 
   // Controller data (received from the player, emit to server)
   io
     .of('/controls')
     .on('connection', socket => {
       console.log("controls connection");
+
+      // Forward disconnect notifications with the socket id
+      socket.on('disconnect', () =>
+        Sender(sockets.server, 'controlsDisconnect', socket.id.replace("/controls#", "")));
+
+      // forward control data
       socket.on('control', data => {
-        console.log("control data", JSON.stringify(data, null, 2));
+        // console.log("control data", JSON.stringify(data, null, 2));
         // Add the user socket id to the data
         data = Object.assign({i: socket.id.replace("/controls#", "")}, data);
 
         // forward the data to the display server
         Sender(sockets.server, 'control', data);
-      })
+      });
     });
 };

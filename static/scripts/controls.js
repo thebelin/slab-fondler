@@ -4,7 +4,7 @@
 "use strict";
 window._Controls = function (el) {
   // whether to console debug
-  const dbg = true;
+  const dbg = false;
 
   if (!el) return dbg && console.log('no element for _Controls');
 
@@ -100,13 +100,12 @@ window._Controls = function (el) {
   // Send the touches to the server
   const SendTouches = fields => {
     let g = document.getElementsByTagName('body')[0];
-    socket.emit('control', Object.assign({}, fields, {
+    socket.emit('control', Object.assign({}, {
       touches: ongoingTouches,
       screen: {
         width: window.outerWidth || el.clientWidth || g.clientWidth,
         height: window.outerHeight|| el.clientHeight|| g.clientHeight
-      }
-    }));
+      }}, fields));
   };
 
   const fadeOut = () => {
@@ -137,6 +136,7 @@ window._Controls = function (el) {
     touchend: evt => {
       evt.preventDefault();
       let touches = evt.changedTouches;
+      let ended = [];
 
       Object.keys(touches).forEach(touchId => {
         let idx = OngoingTouchIndexById(touches[touchId].identifier);
@@ -144,9 +144,10 @@ window._Controls = function (el) {
           ongoingTouches.splice(idx, 1);  // remove it; we're done
 
         Vibe(touches[touchId].force ? touches[touchId].force : 2)
+        ended.push(CopyTouch(touches[touchId]));
       });
 
-      SendTouches({type: 'touchend'});
+      SendTouches({type: 'touchend', touches: ended});
     },
 
     touchcancel: evt => {
