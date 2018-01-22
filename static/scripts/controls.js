@@ -147,7 +147,7 @@ window._Controls = function (el) {
         ended.push(CopyTouch(touches[touchId]));
       });
 
-      SendTouches({type: 'touchend', touches: ended});
+      SendTouches({type: 'touchend', ended: ended});
     },
 
     touchcancel: evt => {
