@@ -237,25 +237,21 @@ window._Controls = function (el) {
 
   const DoTilts = () => {
     if (vrDisplay == null) return dbg && console.log('vrDisplay is null');
-    let thisTime = new Date().getTime();
-    if (lastTransmission + transmissionRate < thisTime) {
-      lastTransmission = thisTime;
 
-      let frameData = new VRFrameData();
-      vrDisplay.getFrameData(frameData);
-      // Make orientation data easier to interpret in Unity:
-      let orientation = {
-        x: frameData.pose.orientation[0],
-        y: frameData.pose.orientation[1],
-        z: frameData.pose.orientation[2],
-        w: frameData.pose.orientation[3]
-      };
+    let frameData = new VRFrameData();
+    vrDisplay.getFrameData(frameData);
+    // Make orientation data easier to interpret in Unity:
+    let orientation = {
+      x: frameData.pose.orientation[0],
+      y: frameData.pose.orientation[1],
+      z: frameData.pose.orientation[2],
+      w: frameData.pose.orientation[3]
+    };
 
-      lastTilt = orientation;
-      // dbg && console.log('send orientation', frameData.pose.orientation);
+    lastTilt = orientation;
+    // dbg && console.log('send orientation', frameData.pose.orientation);
 
-      socket.emit('control', {type:'tilt', tilt: orientation});
-    }
+    socket.emit('control', {type:'tilt', tilt: orientation});
     vrDisplay.requestAnimationFrame(DoTilts);
   };
 
