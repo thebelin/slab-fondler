@@ -6,6 +6,8 @@ window._Controls = function (el) {
   // whether to console debug
   const dbg = false;
 
+  const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
   if (!el) return dbg && console.log('no element for _Controls');
 
   // Minimum number of miiliseconds to wait between each tilt transmission
@@ -207,22 +209,41 @@ window._Controls = function (el) {
       }
     }
   };
+  
+  const deviceorientationHandler = evt => {
+    console.log("deviceorientation event");
+    // Make orientation data easier to interpret in Unity:
+    let orientation = iOS ? {
+      x: evt.beta,
+      y: evt.gamma,
+      z: evt.alpha - 90,
+      w: 1
+    } :  {
+      x: evt.beta,
+      y: evt.gamma,
+      z: evt.alpha,
+      w: 1
+    };
+    socket.emit('control', {type:'tilt', tilt: orientation});
+  }
 
   // Records the current touch profile
   let ongoingTouches = [];
 
-  // records the current tilt profile
-  let tilt, lastTilt = null;
-
-  // the time of the last tilt transmission
-  let lastTransmission = new Date().getTime();
-
   if (el) {
     // monitor for all listener events and send them as they happen
-    Object.keys(listeners).forEach(listener => el.addEventListener(listener, listeners[listener]));
+    Object.keys(listeners).forEach(listener => {
+      console.log("start listener: " + listener);
+      el.addEventListener(listener, listeners[listener], false)
+    });
+
+    if (window.DeviceOrientationEvent) {
+      console.log("Orientation supported");
+      window.addEventListener('deviceorientation', deviceorientationHandler, false);
+    }
 
     // monitor for window resize
-    window.addEventListener('resize', () => setTimeout(() => FillScreen, 250), false);
+    window.addEventListener('resize', () => setTimeout(() => FillScreen, 250));
     FillScreen();
   }
 
@@ -231,50 +252,6 @@ window._Controls = function (el) {
 
   // Fade the touch display
   fadeOut();
-
-  // Monitor for all tilt events and send them as they happen
-  let vrDisplay;
-
-  const DoTilts = () => {
-    if (vrDisplay == null) return dbg && console.log('vrDisplay is null');
-
-    let frameData = new VRFrameData();
-    vrDisplay.getFrameData(frameData);
-    // Make orientation data easier to interpret in Unity:
-    let orientation = {
-      x: frameData.pose.orientation[0],
-      y: frameData.pose.orientation[1],
-      z: frameData.pose.orientation[2],
-      w: frameData.pose.orientation[3]
-    };
-
-    lastTilt = orientation;
-    // dbg && console.log('send orientation', frameData.pose.orientation);
-
-    socket.emit('control', {type:'tilt', tilt: orientation});
-    vrDisplay.requestAnimationFrame(DoTilts);
-  };
-
-  let polyfill;
-  try {
-    polyfill = new WebVRPolyfill();
-    dbg && console.log("Using webvr-polyfill version " + WebVRPolyfill.version);
-
-    if (!navigator.getVRDisplays) return dbg && console.log('WebVR is not supported');
-
-    // Get the VRDisplay and save it for later.
-    navigator.getVRDisplays().then(
-      displays => displays.forEach(display => {
-        dbg && console.log("display", display, display.capabilities);
-        if (display.capabilities.hasOrientation)
-          vrDisplay = display;
-          // Start up the tilt engine
-          DoTilts();
-      }));
-  } catch(e) {
-    console.log('Query of VRDisplays failed' + e.toString());
-  }
-
 };
 
 // Execute the Controls function with an argument of the DOM element to monitor
