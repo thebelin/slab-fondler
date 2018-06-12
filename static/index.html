@@ -7,27 +7,51 @@
 </head>
 <style>
 body {
-	border: 0;
+	border: 2px;
 	margin: 0;
 	padding: 0;
+  background-color: #000;
 }
 #body-ctx {
 	position: absolute;
-	top: 0;
-	left: 0;
+	top: 1%;
+	left: 1%;
+  margin: 0px;
 	background-color: #000;
-};
+  border: 2px #000 solid;
+  width:98%;
+}
+#user-symbol {
+  position: absolute;
+  top: 10px;
+  left: 0px;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  font-size: 8em;
+  z-index: 2;
+  text-shadow: 0px 0px 3px #fff;
+}
+.no-select {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
 </style>
-<script src=webvr-polyfill/webvr-polyfill.min.js></script>
-<body>
-<canvas id="body-ctx" ></canvas>
-<script type="text/javascript">
-	document.body.addEventListener('touchmove', function(event) {
-  	event.preventDefault();
-}, false);
-</script>
-<script src=socket.io/socket.io.js></script>
-<script src=scripts/controls.js></script>
+<body class="no-select">
+  <div id="user-symbol"></div>    
+  <canvas id="body-ctx" ></canvas>
+  <script type="text/javascript">
+  	document.body.addEventListener('touchmove', function(event) {
+    	event.preventDefault();
+  }, false);
+  </script>
+  <script src=socket.io/socket.io.js></script>
+  <script src=scripts/controls.js></script>
 </body>
 </html>
 <body>

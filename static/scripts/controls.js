@@ -19,6 +19,9 @@ window._Controls = function (el) {
   // The body element
   const body = document.getElementsByTagName('body')[0];
 
+  // The symbol indicator
+  const symbol = document.getElementById('user-symbol');
+
   // The socket transporter
   const socket = io.connect('/controls');
 
@@ -211,7 +214,6 @@ window._Controls = function (el) {
   };
   
   const deviceorientationHandler = evt => {
-    console.log("deviceorientation event");
     // Make orientation data easier to interpret in Unity:
     let orientation = iOS ? {
       x: evt.beta,
@@ -233,12 +235,12 @@ window._Controls = function (el) {
   if (el) {
     // monitor for all listener events and send them as they happen
     Object.keys(listeners).forEach(listener => {
-      console.log("start listener: " + listener);
+      dbg && console.log("start listener: " + listener);
       el.addEventListener(listener, listeners[listener], false)
     });
 
     if (window.DeviceOrientationEvent) {
-      console.log("Orientation supported");
+      dbg && console.log("Orientation supported");
       window.addEventListener('deviceorientation', deviceorientationHandler, false);
     }
 
@@ -247,8 +249,28 @@ window._Controls = function (el) {
     FillScreen();
   }
 
-  // Subscribe to server side events (not yet used)
-  socket.on('event', data => dbg && console.log('player event data: ', data));
+  // Subscribe to server side events
+  const eventRouter = {
+    // The server has sent a color indicator, update the overlay
+    color: color => {
+      el.style.cssText = "border-color: " + color;
+      symbol.style.cssText = "color: " + color;
+    },
+
+    // The server has sent a symbol indicator, update the overlay
+    symbol: sym => symbol.innerHTML = sym,
+
+    // The server has indicated that a vibe for a specific amount of time should be done
+    vibe: time => Vibe(time)
+  };
+  
+  socket.on('event', data => {
+    console.log("event", data);
+    if (data.eventType && eventRouter[data.eventType])
+      eventRouter[data.eventType](data.eventData);
+    else
+      console.log('player event data not routed: ', data);
+  });
 
   // Fade the touch display
   fadeOut();

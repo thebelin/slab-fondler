@@ -21,12 +21,14 @@ module.exports = (io) => {
       let index = this.playerIds.indexOf(playerId);
       if (index != -1) {
         this.playerSockets[index].emit('event', data);
+      } else {
+        console.log("no player for event: ", playerId, data);
       }
     },
 
     // Add method
-    Add: (player, playerId, socket) => {
-      this.players.push(player);
+    Add: (playerId, socket) => {
+      console.log("Add Player: ", playerId);
       this.playerIds.push(playerId);
       this.playerSockets.push(socket);
     },
@@ -35,7 +37,6 @@ module.exports = (io) => {
     Remove: playerId => {
       let index = this.playerIds.indexOf(playerId);
       if (index != -1) {
-        this.players.splice(index, 1);
         this.playerIds.splice(index, 1);
         this.playerSockets.splice(index, 1);
       }
@@ -43,10 +44,12 @@ module.exports = (io) => {
 
     // Reset method
     Reset: () => {
-      this.players = [];
       this.playerIds = [];
       this.playerSockets = [];
-    }
+    },
+
+    // return the number of players
+    Total: () => this.playerIds.length
   };
 
   // These will contain active sockets which need to be rebroadcast to
@@ -88,19 +91,26 @@ io
     socket.on('disconnect', () => disconnect(socket, "server"));
 
     // Player event (goes to one player)
-    socket.on('event', (playerId, eventType, eventData) => 
-      Players.sendPlayer(playerId, {eventType: eventType, eventData: eventData}));
+    socket.on('event', (playerId, eventType, eventData) => {
+      console.log("player event: ", playerId, eventType, eventData);
+      Players.sendPlayer(playerId, {eventType: eventType, eventData: eventData});
+    });
   });
 
   // Controller data (received from the player, emit to server)
   io
     .of('/controls')
     .on('connection', socket => {
-      console.log("controls connection");
+      console.log("controls connection (total users: " + Players.Total());
+
+      // Add this player to the players list
+      Players.Add(socket.id.replace("/controls#", ""), socket);
 
       // Forward disconnect notifications with the socket id
-      socket.on('disconnect', () =>
-        Sender(sockets.server, 'controlsDisconnect', socket.id.replace("/controls#", "")));
+      socket.on('disconnect', () => {
+        Sender(sockets.server, 'controlsDisconnect', socket.id.replace("/controls#", ""));
+        Players.Remove(socket.id.replace("/controls#", ""));
+      });
 
       // forward control data
       socket.on('control', data => {
