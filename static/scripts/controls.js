@@ -215,12 +215,7 @@ window._Controls = function (el) {
   
   const deviceorientationHandler = evt => {
     // Make orientation data easier to interpret in Unity:
-    let orientation = iOS ? {
-      x: evt.beta,
-      y: evt.gamma,
-      z: evt.alpha - 90,
-      w: 1
-    } :  {
+    let orientation = {
       x: evt.beta,
       y: evt.gamma,
       z: evt.alpha,
