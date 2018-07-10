@@ -121,5 +121,15 @@ io
         // forward the data to the display server
         Sender(sockets.server, 'control', data);
       });
+
+      // forward reset requests
+      socket.on('reset', data => {
+        console.log("RESET");
+        // Add the user socket id to the data
+        data = {i: socket.id.replace("/controls#", "")};
+
+        // forward the reset request to the display server
+        Sender(sockets.server, 'reset', data);
+      });
     });
 };

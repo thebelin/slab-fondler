@@ -22,6 +22,9 @@ window._Controls = function (el) {
   // The symbol indicator
   const symbol = document.getElementById('user-symbol');
 
+  // The Reset button
+  const reset = document.getElementById('reset-button');
+
   // The socket transporter
   const socket = io.connect('/controls');
 
@@ -213,6 +216,13 @@ window._Controls = function (el) {
     }
   };
   
+  // Allow the user to reset their orientation
+  reset.addEventListener('mousedown', evt => {
+    console.log("reset");
+    socket.emit('reset');
+  });
+
+  // Handle change in the device orientation
   const deviceorientationHandler = evt => {
     // Make orientation data easier to interpret in Unity:
     let orientation = {

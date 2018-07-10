@@ -20,6 +20,7 @@ body {
 	background-color: #000;
   border: 2px #000 solid;
   width:98%;
+  z-index: 1;
 }
 #user-symbol {
   position: absolute;
@@ -32,6 +33,18 @@ body {
   z-index: 2;
   text-shadow: 0px 0px 3px #fff;
 }
+#reset-button {
+  background:#d55 url("images/reset-200.png") no-repeat;
+  background-size: cover;
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  z-index: 3;
+  border-radius: 25px;
+  opacity: .7;
+}
 .no-select {
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
@@ -43,7 +56,8 @@ body {
 }
 </style>
 <body class="no-select">
-  <div id="user-symbol"></div>    
+  <div id="user-symbol"></div>
+  <a id="reset-button"></a>  
   <canvas id="body-ctx" ></canvas>
   <script type="text/javascript">
   	document.body.addEventListener('touchmove', function(event) {
