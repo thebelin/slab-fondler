@@ -25,6 +25,9 @@ window._Controls = function (el) {
   // The Reset button
   const reset = document.getElementById('reset-button');
 
+  // The forwarding html area
+  const forward = document.getElementById('forward-browser');
+
   // The socket transporter
   const socket = io.connect('/controls');
 
@@ -122,6 +125,10 @@ window._Controls = function (el) {
     setTimeout(fadeOut,100);
   };
 
+  const forwardUrl = url => {
+    forward.src = url;
+    forward.style.display = "inline-block";
+  };
 
   /**
    * These event listeners will be attached to the event they are named after
@@ -266,7 +273,10 @@ window._Controls = function (el) {
     symbol: sym => symbol.innerHTML = sym,
 
     // The server has indicated that a vibe for a specific amount of time should be done
-    vibe: time => Vibe(time)
+    vibe: time => Vibe(time),
+
+    // The server is asking the user to go to a web page
+    forward: url => forwardUrl(url)
   };
   
   socket.on('event', data => {

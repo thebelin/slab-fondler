@@ -34,16 +34,29 @@ body {
   text-shadow: 0px 0px 3px #fff;
 }
 #reset-button {
-  background:#d55 url("images/reset-200.png") no-repeat;
+  background:#f55 url("images/reset-200.png") no-repeat;
   background-size: cover;
   width: 50px;
   height: 50px;
   position: absolute;
-  top: 0px;
-  right: 0px;
+  top: 3px;
+  right: 3px;
   z-index: 3;
   border-radius: 25px;
   opacity: .7;
+}
+#forward-browser {
+  display: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  margin: 0px;
+  top: 0px;
+  left: 0px;
+  z-index: 4;
+}
+#controls-container {
+  display: inline-block;
 }
 .no-select {
   -webkit-touch-callout: none; /* iOS Safari */
@@ -56,9 +69,12 @@ body {
 }
 </style>
 <body class="no-select">
-  <div id="user-symbol"></div>
-  <a id="reset-button"></a>  
-  <canvas id="body-ctx" ></canvas>
+  <div id="controls-container">
+    <div id="user-symbol"></div>
+    <a id="reset-button"></a>
+    <canvas id="body-ctx" ></canvas>
+  </div>
+  <iframe id="forward-browser"></iframe>
   <script type="text/javascript">
   	document.body.addEventListener('touchmove', function(event) {
     	event.preventDefault();

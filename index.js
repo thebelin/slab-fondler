@@ -52,10 +52,7 @@ app.use(bodyParser.urlencoded({
 // get information from html forms
 app.use(bodyParser.json({limit: '1024mb'}));
 
-// set up ejs for server side templating
-app.set('view engine', 'ejs');
-
-// Compression module speeds requests
+// Compression module speeds get requests
 app.use(compression());
 
 // Make the http folder available as the root, to deliver the static content
@@ -63,9 +60,6 @@ app.use('/', require('express').static('static'));
 
 // make the screenfull dist folder available to the user
 app.use('/screenfull', require('express').static('node_modules/screenfull/dist'));
-
-// make the screenfull dist folder available to the user
-app.use('/webvr-polyfill', require('express').static('node_modules/webvr-polyfill/build'));
 
 console.log('starting http server on port ' + port);
 
