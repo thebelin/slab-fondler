@@ -6,6 +6,9 @@ window._Controls = function (el) {
   // whether to console debug
   const dbg = false;
 
+  // The current timeout mode
+  let isTimeout = false;
+
   const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
   if (!el) return dbg && console.log('no element for _Controls');
@@ -128,6 +131,12 @@ window._Controls = function (el) {
   const forwardUrl = url => {
     forward.src = url;
     forward.style.display = "inline-block";
+  };
+
+  const timeout = time => {
+    forward.src = '/timeout?start=' + time;
+    forward.style.display = "inline-block";
+    setTimeout(() => {forward.style.display = "none"}, time)
   };
 
   /**
@@ -276,7 +285,10 @@ window._Controls = function (el) {
     vibe: time => Vibe(time),
 
     // The server is asking the user to go to a web page
-    forward: url => forwardUrl(url)
+    forward: url => forwardUrl(url),
+
+    // The server is putting this user into timeout
+    timeout: time => timeout(time)
   };
   
   socket.on('event', data => {
