@@ -114,7 +114,14 @@ io
 
       // forward control data
       socket.on('control', data => {
-        // console.log("control data", JSON.stringify(data, null, 2));
+        try {
+        if (typeof(data) == "string")
+          data = JSON.parse(data);
+        } catch (e){
+          console.error(e, data)
+        }
+
+        console.log("control data", JSON.stringify(data, null, 2));
         // Add the user socket id to the data
         data = Object.assign({i: socket.id.replace("/controls#", "")}, data);
 
