@@ -138,5 +138,16 @@ io
         // forward the reset request to the display server
         Sender(sockets.server, 'reset', data);
       });
+
+      // forward ping requests
+      socket.on('locate', data => {
+        console.log("PING LOCATION");
+        // Add the user socket id to the data
+        data = {i: socket.id.replace("/controls#", "")};
+
+        // forward the reset request to the display server
+        Sender(sockets.server, 'locate', data);
+      });
+
     });
 };

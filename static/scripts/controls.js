@@ -28,6 +28,9 @@ window._Controls = function (el) {
   // The Reset button
   const reset = document.getElementById('reset-button');
 
+  // The Ping button
+  const ping = document.getElementById('ping-button');
+
   // The forwarding html area
   const forward = document.getElementById('forward-browser');
 
@@ -236,6 +239,12 @@ window._Controls = function (el) {
   reset.addEventListener('mousedown', evt => {
     console.log("reset");
     socket.emit('reset');
+  });
+
+  // Allow the user to ping their location
+  ping.addEventListener('mousedown', evt => {
+    console.log("locate");
+    socket.emit('locate');
   });
 
   // Handle change in the device orientation
