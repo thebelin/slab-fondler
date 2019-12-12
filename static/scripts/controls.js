@@ -271,7 +271,20 @@ window._Controls = function (el) {
 
     if (window.DeviceOrientationEvent) {
       dbg && console.log("Orientation supported");
-      window.addEventListener('deviceorientation', deviceorientationHandler, false);
+      // If this device is iOS 13+, the user needs to authorize the use of deviceorientation events
+      if (typeof DeviceMotionEvent.requestPermission === 'function') {
+        // iOS 13+
+        DeviceOrientationEvent.requestPermission()
+          .then(response => {
+            if (response == 'granted') {
+              window.addEventListener('deviceorientation', deviceorientationHandler, false);
+            }
+          })
+          .catch(console.error)
+      } else {
+        // non iOS 13+
+        window.addEventListener('deviceorientation', deviceorientationHandler, false);
+      }
     }
 
     // monitor for window resize
