@@ -34,6 +34,9 @@ window._Controls = function (el) {
   // The forwarding html area
   const forward = document.getElementById('forward-browser');
 
+  // The Start button
+  const start = document.getElementById('start-button');
+
   // The socket transporter
   const socket = io.connect('/controls');
 
@@ -247,6 +250,28 @@ window._Controls = function (el) {
     socket.emit('locate');
   });
 
+  // Start button inits the tilt listener
+  start.addEventListener('mousedown', evt => {
+    start.style.display = 'none';
+    if (window.DeviceOrientationEvent) {
+      dbg && console.log("Orientation supported");
+      // If this device is iOS 13+, the user needs to authorize the use of deviceorientation events
+      if (typeof window.DeviceOrientationEvent.requestPermission === 'function') {
+        // iOS 13+
+        window.DeviceOrientationEvent.requestPermission()
+          .then(response => {
+            if (response == 'granted') {
+              window.addEventListener('deviceorientation', deviceorientationHandler, false);
+            }
+          })
+          .catch(console.error)
+      } else {
+        // non iOS 13+
+        window.addEventListener('deviceorientation', deviceorientationHandler, false);
+      }
+    }
+  });
+
   // Handle change in the device orientation
   const deviceorientationHandler = evt => {
     // Make orientation data easier to interpret in Unity:
@@ -268,24 +293,6 @@ window._Controls = function (el) {
       dbg && console.log("start listener: " + listener);
       el.addEventListener(listener, listeners[listener], false)
     });
-
-    if (window.DeviceOrientationEvent) {
-      dbg && console.log("Orientation supported");
-      // If this device is iOS 13+, the user needs to authorize the use of deviceorientation events
-      if (typeof DeviceMotionEvent.requestPermission === 'function') {
-        // iOS 13+
-        DeviceOrientationEvent.requestPermission()
-          .then(response => {
-            if (response == 'granted') {
-              window.addEventListener('deviceorientation', deviceorientationHandler, false);
-            }
-          })
-          .catch(console.error)
-      } else {
-        // non iOS 13+
-        window.addEventListener('deviceorientation', deviceorientationHandler, false);
-      }
-    }
 
     // monitor for window resize
     window.addEventListener('resize', () => setTimeout(() => FillScreen, 250));

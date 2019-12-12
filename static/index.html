@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  	<title>Interactive Page</title>
+  	<title>Immersive Interaction</title>
   	<meta name="mobile-web-app-capable" content="yes">
 	<meta name="viewport" content="minimal-ui, width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 </head>
@@ -67,6 +67,32 @@ body {
   left: 0px;
   z-index: 4;
 }
+
+#start-button {
+  background:#f55 url("images/play-256.png") no-repeat;
+  background-size: cover;
+  border-style: button;
+  background-color: #5f5;
+  width: 256px;
+  height: 256px;
+  position: absolute;
+  top: 25%;
+  left: 25%;
+  z-index: 5;
+  border-radius: 50%;
+  color: #fff;
+  opacity: .7;
+  -webkit-animation-name: pop; /* Safari 4.0 - 8.0 */
+  -webkit-animation-duration: .75s; /* Safari 4.0 - 8.0 */
+  animation-name: pop;
+  animation-duration: .75s;
+}
+
+@-webkit-keyframes pop {
+  from {width: 128px; height: 128px; opacity:.2;}
+  to {width: 256px; height: 256px; opacity: .7;}
+}
+
 #controls-container {
   display: inline-block;
 }
@@ -85,6 +111,7 @@ body {
     <a id="ping-button"></a>
     <div id="user-symbol"></div>
     <a id="reset-button"></a>
+    <a id="start-button"></a>
     <canvas id="body-ctx" ></canvas>
   </div>
   <iframe id="forward-browser"></iframe>
