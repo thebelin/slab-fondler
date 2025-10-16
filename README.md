@@ -6,6 +6,3 @@ A web portal which allows movements and touch events on a phone to be tracked an
 * open a terminal window to that folder
 ` npm i`
 ` npm start`
-
-## Deployed At
-https://slab-fondler.herokuapp.com/
